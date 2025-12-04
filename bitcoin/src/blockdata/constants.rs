@@ -24,11 +24,11 @@ use crate::network::Network;
 use crate::pow::CompactTarget;
 use crate::Amount;
 
-/// How many seconds between blocks we expect on average.
-pub const TARGET_BLOCK_SPACING: u32 = 60;
+/// How many seconds between blocks we expect on average (Junocash POST_BLOSSOM).
+pub const TARGET_BLOCK_SPACING: u32 = 75;
 /// How many blocks between diffchanges.
-pub const DIFFCHANGE_INTERVAL: u32 = 2016;
-/// How much time on average should occur between diffchanges.
+pub const DIFFCHANGE_INTERVAL: u32 = 1152;
+/// How much time on average should occur between diffchanges (24 hours).
 pub const DIFFCHANGE_TIMESPAN: u32 = 24 * 60 * 60;
 
 #[deprecated(since = "0.31.0", note = "Use Weight::MAX_BLOCK instead")]
@@ -43,26 +43,26 @@ pub const MIN_TRANSACTION_WEIGHT: u32 = 4 * 60;
 pub const WITNESS_SCALE_FACTOR: usize = 4;
 /// The maximum allowed number of signature check operations in a block.
 pub const MAX_BLOCK_SIGOPS_COST: i64 = 80_000;
-/// Mainnet (federalreserveCoin) pubkey address prefix.
-pub const PUBKEY_ADDRESS_PREFIX_MAIN: u8 = 48;
-/// Mainnet (federalreserveCoin) script address prefix.
-pub const SCRIPT_ADDRESS_PREFIX_MAIN: u8 = 5;
+/// Mainnet (Junocash) pubkey address prefix.
+pub const PUBKEY_ADDRESS_PREFIX_MAIN: u8 = 0x1C;
+/// Mainnet (Junocash) script address prefix.
+pub const SCRIPT_ADDRESS_PREFIX_MAIN: u8 = 0x1C;
 /// Test (signet, regtest) pubkey address prefix.
-pub const PUBKEY_ADDRESS_PREFIX_TEST: u8 = 111; // 0x6f
+pub const PUBKEY_ADDRESS_PREFIX_TEST: u8 = 0x1D;
 /// Test (tesnet, signet, regtest) script address prefix.
-pub const SCRIPT_ADDRESS_PREFIX_TEST: u8 = 196; // 0xc4
+pub const SCRIPT_ADDRESS_PREFIX_TEST: u8 = 0x1C;
 // Regtest pubkey address prefix.
 pub const PUBKEY_ADDRESS_PREFIX_REGTEST: u8 = 111; // 0x6f
 /// The maximum allowed script size.
 pub const MAX_SCRIPT_ELEMENT_SIZE: usize = 520;
-/// How may blocks between halvings.
-pub const SUBSIDY_HALVING_INTERVAL: u32 = 100_000;
+/// How may blocks between halvings (Junocash uses 840000 pre-blossom).
+pub const SUBSIDY_HALVING_INTERVAL: u32 = 840_000;
 /// Maximum allowed value for an integer in Script.
 pub const MAX_SCRIPTNUM_VALUE: u32 = 0x80000000; // 2^31
 /// Number of blocks needed for an output from a coinbase transaction to be spendable.
-pub const COINBASE_MATURITY: u32 = 70;
+pub const COINBASE_MATURITY: u32 = 100;
 
-/// Constructs and returns the coinbase (and only) transaction of the Bitcoin genesis block.
+/// Constructs and returns the coinbase (and only) transaction of the Junocash genesis block.
 fn bitcoin_genesis_tx() -> Transaction {
     // Base
     let mut ret = Transaction {
@@ -74,12 +74,9 @@ fn bitcoin_genesis_tx() -> Transaction {
 
     // Inputs
     let in_script = script::Builder::new()
-        .push_int(486604799)
+        .push_int(520617983)
         .push_int_non_minimal(4)
-        .push_slice(b"Wed May 1, 2013: ")
-        .push_slice(b"Spot gold fell 1.3 percent to ")
-        .push_slice(b"$1,457.90 an ounce by 3:11 p.m. ")
-        .push_slice(b"EDT (1911 GMT)")
+        .push_slice(b"b7c923155000000000007ca8a49b1fc30e20bd9d5a3ca9a092af920f2f27b0c3")
         .into_script();
     ret.input.push(TxIn {
         previous_output: OutPoint::null(),
@@ -89,10 +86,10 @@ fn bitcoin_genesis_tx() -> Transaction {
     });
 
     // Outputs
-    let script_bytes = hex!("040184710fa689ad5023690c80f3a49c8f13f8d45b8c857fbcbc8bc4a8e4d3eb4b10f4d4604fa08dce601aaf0f470216fe1b51850b4acf21b179c45070ac7b03a9");
+    let script_bytes = hex!("04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5f");
     let out_script =
         script::Builder::new().push_slice(script_bytes).push_opcode(OP_CHECKSIG).into_script();
-    ret.output.push(TxOut { value: Amount::from_sat(50 * 100_000_000), script_pubkey: out_script });
+    ret.output.push(TxOut { value: Amount::from_sat(0), script_pubkey: out_script });
 
     // end
     ret
@@ -101,53 +98,53 @@ fn bitcoin_genesis_tx() -> Transaction {
 /// Constructs and returns the genesis block.
 pub fn genesis_block(network: Network) -> Block {
     let txdata = vec![bitcoin_genesis_tx()];
-    let hash: sha256d::Hash = sha256d::Hash::from_slice(&hex!("3de124b0274307911fe12550e96bf76cb92c12835db6cb19f82658b8aca1dbc8")).unwrap();
+    let hash: sha256d::Hash = sha256d::Hash::from_slice(&hex!("672c43c131c7926fa7685cc000c9dc0450f7e803886b5c34445819686f8e53f")).unwrap();
     let merkle_root = hash.into();
     match network {
         Network::Bitcoin => Block {
             header: block::Header {
-                version: block::Version::ONE,
+                version: block::Version::from_consensus(4),
                 prev_blockhash: Hash::all_zeros(),
                 merkle_root,
-                time: 1367394064,
-                bits: CompactTarget::from_consensus(0x1e0ffff0),
-                nonce: 112158625,
+                time: 1763197809,
+                bits: CompactTarget::from_consensus(0x2000ffff),
+                nonce: 0x1398,
                 aux_data: None,
             },
             txdata,
         },
         Network::Testnet => Block {
             header: block::Header {
-                version: block::Version::ONE,
+                version: block::Version::from_consensus(4),
                 prev_blockhash: Hash::all_zeros(),
                 merkle_root,
-                time: 1367394064,
-                bits: CompactTarget::from_consensus(0x1e0ffff0),
-                nonce: 112158625,
+                time: 1763197808,
+                bits: CompactTarget::from_consensus(0x2000ffff),
+                nonce: 0xc0,
                 aux_data: None,
             },
             txdata,
         },
         Network::Signet => Block {
             header: block::Header {
-                version: block::Version::ONE,
+                version: block::Version::from_consensus(4),
                 prev_blockhash: Hash::all_zeros(),
                 merkle_root,
-                time: 1367394064,
-                bits: CompactTarget::from_consensus(0x1e0ffff0),
-                nonce: 112158625,
+                time: 1763197808,
+                bits: CompactTarget::from_consensus(0x2000ffff),
+                nonce: 0xc0,
                 aux_data: None,
             },
             txdata,
         },
         Network::Regtest => Block {
             header: block::Header {
-                version: block::Version::ONE,
+                version: block::Version::from_consensus(4),
                 prev_blockhash: Hash::all_zeros(),
                 merkle_root,
-                time: 1369199888,
-                bits: CompactTarget::from_consensus(0x1e0ffff0),
-                nonce: 12097647,
+                time: 1763197807,
+                bits: CompactTarget::from_consensus(0x200f0f0f),
+                nonce: 0x36,
                 aux_data: None,
             },
             txdata,
@@ -162,19 +159,17 @@ impl_array_newtype!(ChainHash, u8, 32);
 impl_bytes_newtype!(ChainHash, 32);
 
 impl ChainHash {
-    // Mainnet value can be verified at https://github.com/lightning/bolts/blob/master/00-introduction.md
-    //https://bitcoin.stackexchange.com/questions/74358/what-is-bitcoins-genesis-hash
-    /// `ChainHash` for mainnet bitcoin.
-
-    //Junkcoin as no test networks, so all of em are set to mainnet
-
-    pub const BITCOIN: Self = Self([162, 239, 250, 115, 129, 69, 227, 119, 224, 138, 97, 215, 97, 121, 194, 23, 3, 225, 62, 72, 145, 11, 48, 162, 168, 127, 13, 254, 121, 75, 100, 198]);
-    /// `ChainHash` for testnet bitcoin.
-    pub const TESTNET: Self = Self([162, 239, 250, 115, 129, 69, 227, 119, 224, 138, 97, 215, 97, 121, 194, 23, 3, 225, 62, 72, 145, 11, 48, 162, 168, 127, 13, 254, 121, 75, 100, 198]);
-    /// `ChainHash` for signet bitcoin.
-    pub const SIGNET: Self = Self([162, 239, 250, 115, 129, 69, 227, 119, 224, 138, 97, 215, 97, 121, 194, 23, 3, 225, 62, 72, 145, 11, 48, 162, 168, 127, 13, 254, 121, 75, 100, 198]);
-    /// `ChainHash` for regtest bitcoin.
-    pub const REGTEST: Self = Self([50, 70, 53, 200, 227, 111, 102, 59, 10, 219, 18, 106, 33, 173, 11, 215, 250, 67, 204, 92, 95, 21, 174, 201, 146, 191, 77, 222, 101, 11, 192, 234]);
+    /// `ChainHash` for Junocash mainnet.
+    /// Genesis hash: 0x0091ff2592b34a24eb014637f76c5ee416ce7a6928e8940f96e78954351d70bc
+    pub const BITCOIN: Self = Self([0xbc, 0x70, 0x1d, 0x35, 0x54, 0x89, 0xe7, 0x96, 0x0f, 0x94, 0xe8, 0x28, 0x69, 0x7a, 0xce, 0x16, 0xe4, 0x5e, 0x6c, 0xf7, 0x37, 0x46, 0x01, 0xeb, 0x24, 0x4a, 0xb3, 0x92, 0x25, 0xff, 0x91, 0x00]);
+    /// `ChainHash` for Junocash testnet.
+    /// Genesis hash: 0x009a83c6bd95d1f0548fe4c5f6555c785e9c456ca33f58c2d7755c2bdd1e842f
+    pub const TESTNET: Self = Self([0x2f, 0x84, 0x1e, 0xdd, 0x2b, 0x5c, 0x75, 0xd7, 0xc2, 0x58, 0x3f, 0xa3, 0x6c, 0x45, 0x9c, 0x5e, 0x78, 0x5c, 0x55, 0xf6, 0xc5, 0xe4, 0x8f, 0x54, 0xf0, 0xd1, 0x95, 0xbd, 0xc6, 0x83, 0x9a, 0x00]);
+    /// `ChainHash` for Junocash signet (using testnet values).
+    pub const SIGNET: Self = Self([0x2f, 0x84, 0x1e, 0xdd, 0x2b, 0x5c, 0x75, 0xd7, 0xc2, 0x58, 0x3f, 0xa3, 0x6c, 0x45, 0x9c, 0x5e, 0x78, 0x5c, 0x55, 0xf6, 0xc5, 0xe4, 0x8f, 0x54, 0xf0, 0xd1, 0x95, 0xbd, 0xc6, 0x83, 0x9a, 0x00]);
+    /// `ChainHash` for Junocash regtest.
+    /// Genesis hash: 0x02a19528ff5e8241dc7601cf7f54a74d26e0f2acc393a7ac964d055e6d1925db
+    pub const REGTEST: Self = Self([0xdb, 0x25, 0x19, 0x6d, 0x5e, 0x05, 0x4d, 0x96, 0xac, 0xa7, 0x93, 0xc3, 0xac, 0xf2, 0xe0, 0x26, 0x4d, 0xa7, 0x54, 0x7f, 0xcf, 0x01, 0x76, 0xdc, 0x41, 0x82, 0x5e, 0xff, 0x28, 0x95, 0xa1, 0x02]);
 
     /// Returns the hash of the `network` genesis block for use as a chain hash.
     ///

@@ -120,22 +120,20 @@ impl Target {
     ///
     /// Not all target values are attainable because consensus code uses the compact format to
     /// represent targets (see `CompactTarget`).
-    pub const MAX_ATTAINABLE_MAINNET: Self = Target(U256(0xFFFF_u128 << (208 - 128), 0));
+    /// Junocash mainnet: 0x0007ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+    pub const MAX_ATTAINABLE_MAINNET: Self = Target(U256(0x0007_ffff_ffff_ffff_u128 << 64, 0xffff_ffff_ffff_ffff_ffff_ffff_ffff_ffff));
 
     /// The proof of work limit on testnet.
-    // Taken from Bitcoin Core but had lossy conversion to/from compact form.
-    // https://github.com/bitcoin/bitcoin/blob/8105bce5b384c72cf08b25b7c5343622754e7337/src/kernel/chainparams.cpp#L208
-    pub const MAX_ATTAINABLE_TESTNET: Self = Target(U256(0xFFFF_u128 << (208 - 128), 0));
+    /// Junocash testnet: 0x07ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+    pub const MAX_ATTAINABLE_TESTNET: Self = Target(U256(0x07ff_ffff_ffff_ffff_u128 << 64, 0xffff_ffff_ffff_ffff_ffff_ffff_ffff_ffff));
 
     /// The proof of work limit on regtest.
-    // Taken from Bitcoin Core but had lossy conversion to/from compact form.
-    // https://github.com/bitcoin/bitcoin/blob/8105bce5b384c72cf08b25b7c5343622754e7337/src/kernel/chainparams.cpp#L411
-    pub const MAX_ATTAINABLE_REGTEST: Self = Target(U256(0x7FFF_FF00u128 << 96, 0));
+    /// Junocash regtest: 0x0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f
+    pub const MAX_ATTAINABLE_REGTEST: Self = Target(U256(0x0f0f_0f0f_0f0f_0f0f_0f0f_0f0f_0f0f_0f0f_u128, 0x0f0f_0f0f_0f0f_0f0f_0f0f_0f0f_0f0f_0f0f_u128));
 
-    /// The proof of work limit on signet.
-    // Taken from Bitcoin Core but had lossy conversion to/from compact form.
-    // https://github.com/bitcoin/bitcoin/blob/8105bce5b384c72cf08b25b7c5343622754e7337/src/kernel/chainparams.cpp#L348
-    pub const MAX_ATTAINABLE_SIGNET: Self = Target(U256(0x0377_ae00 << 80, 0));
+    /// The proof of work limit on signet (using testnet values).
+    /// Junocash signet: 0x07ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+    pub const MAX_ATTAINABLE_SIGNET: Self = Target(U256(0x07ff_ffff_ffff_ffff_u128 << 64, 0xffff_ffff_ffff_ffff_ffff_ffff_ffff_ffff));
 
     /// The maximum possible target (see [`Target::MAX`]).
     ///

@@ -55,30 +55,30 @@ impl Params {
             Network::Bitcoin => Params {
                 network: Network::Bitcoin,
                 bip16_time: 1333238400,  // Apr 1 2012
-                // From chainparams.cpp consensus section
-                bip34_height: 0x210c,    // BIP34Height from consensus
-                bip65_height: 0x210c,    // BIP65Height from consensus 
-                bip66_height: 0x210c,    // BIP66Height from consensus
+                // From Junocash chainparams.cpp consensus section
+                bip34_height: 0x210c,    // 8460 from consensus
+                bip65_height: 0x210c,    // 8460 from consensus 
+                bip66_height: 0x210c,    // 8460 from consensus
                 rule_change_activation_threshold: 9576, // 95% of 10,080
                 miner_confirmation_window: 10080,      // 60 * 24 * 7 = 10,080 blocks, or one week
                 pow_limit: Target::MAX_ATTAINABLE_MAINNET,
-                pow_target_spacing: 60,   // 1 minute from nPowTargetSpacing
-                pow_target_timespan: 24 * 60 * 60, // 1 day from nPowTargetTimespan
+                pow_target_spacing: 75,   // POST_BLOSSOM: 75 seconds
+                pow_target_timespan: 24 * 60 * 60, // 1 day = 86400 seconds
                 allow_min_difficulty_blocks: false,
                 no_pow_retargeting: false,
             },
             Network::Testnet => Params {
                 network: Network::Testnet,
                 bip16_time: 1333238400,
-                bip34_height: 99999999,  // From consensus
-                bip65_height: 99999999,  // From consensus
-                bip66_height: 99999999,  // From consensus
+                bip34_height: 99999999,  // From Junocash consensus
+                bip65_height: 99999999,  // From Junocash consensus
+                bip66_height: 99999999,  // From Junocash consensus
                 rule_change_activation_threshold: 9576, // 95% of 10,080
                 miner_confirmation_window: 10080,
                 pow_limit: Target::MAX_ATTAINABLE_TESTNET,
-                pow_target_spacing: 60,   // 1 minute
-                pow_target_timespan: 4 * 60 * 60, // 4 hours from consensus
-                allow_min_difficulty_blocks: true, // from fPowAllowMinDifficultyBlocks
+                pow_target_spacing: 75,   // POST_BLOSSOM: 75 seconds
+                pow_target_timespan: 14400, // 4 hours from Junocash consensus
+                allow_min_difficulty_blocks: true,
                 no_pow_retargeting: false,
             },
             Network::Signet => Params {
@@ -90,8 +90,8 @@ impl Params {
                 rule_change_activation_threshold: 9576,
                 miner_confirmation_window: 10080,
                 pow_limit: Target::MAX_ATTAINABLE_SIGNET,
-                pow_target_spacing: 60,   // 1 minute
-                pow_target_timespan: 4 * 60 * 60, // 4 hours
+                pow_target_spacing: 75,   // POST_BLOSSOM: 75 seconds
+                pow_target_timespan: 14400, // 4 hours
                 allow_min_difficulty_blocks: true,
                 no_pow_retargeting: false,
             },
@@ -104,8 +104,8 @@ impl Params {
                 rule_change_activation_threshold: 9576,
                 miner_confirmation_window: 10080,
                 pow_limit: Target::MAX_ATTAINABLE_REGTEST,
-                pow_target_spacing: 60,   // 1 minute spacing between blocks
-                pow_target_timespan: 4 * 60 * 60, // 4 hours timespan
+                pow_target_spacing: 75,   // POST_BLOSSOM: 75 seconds
+                pow_target_timespan: 14400, // 4 hours
                 allow_min_difficulty_blocks: true,
                 no_pow_retargeting: false,
             },
